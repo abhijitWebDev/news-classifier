@@ -13,7 +13,7 @@ from .examples import FEW_SHOT_EXAMPLES
 # cheaper if you are running volume; Sol is the flagship if the boundary cases
 # matter more than the bill. Use `news-classifier-eval --compare` to decide
 # rather than guessing -- that is what it is for.
-MODEL = os.environ.get("OPENAI_MODEL", "gpt-5.6-terra")
+MODEL = os.environ.get("OPENAI_MODEL", "gpt-5.6-luna")
 
 # Reasoning tokens count against max_output_tokens, so a classification-sized
 # budget of ~256 would truncate the response before the JSON was emitted.
