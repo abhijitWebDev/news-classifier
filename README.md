@@ -20,6 +20,12 @@ Or export the key directly: `export OPENAI_API_KEY=sk-proj-...`
 Set `OPENAI_MODEL` to change model: `gpt-5.6-luna` (cheapest), `gpt-5.6-terra`
 (default), `gpt-5.6-sol` (best).
 
+Older non-reasoning models work too — `OPENAI_MODEL=gpt-4o-mini` is fine. Those
+models reject the `reasoning` parameter with a 400, so the classifier sends it,
+catches that one specific rejection, drops it and remembers for the rest of the
+process. That costs one extra request on the first call and nothing after. No
+hardcoded list of reasoning models to keep up to date.
+
 ## The assignment's claim, on your own article
 
 The objective is *improve consistency with few-shot prompting*. "Improve" is a

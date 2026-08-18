@@ -96,3 +96,103 @@ def test_hard_cases_are_not_reused_from_the_few_shot_examples():
     shown = {article.strip() for article, _ in FEW_SHOT_EXAMPLES}
     for case in HARD_CASES:
         assert case.text.strip() not in shown
+
+
+def _bad_request(message: str):
+    """Build a real BadRequestError -- the SDK needs a live response object.
+
+    The OpenAI SDK moved to httpx2; import it via the SDK so this keeps working
+    if that changes again.
+    """
+    import openai
+    from openai._base_client import httpx2 as httpx
+
+    response = httpx.Response(
+        400, request=httpx.Request("POST", "https://api.openai.com/v1/responses")
+    )
+    return openai.BadRequestError(message, response=response, body=None)
+
+
+UNSUPPORTED_REASONING = (
+    "Error code: 400 - {'error': {'message': \"Unsupported parameter: "
+    "'reasoning.effort' is not supported with this model.\"}}"
+)
+
+
+class _FakeResponses:
+    """Stands in for client.responses, recording what each call was sent."""
+
+    def __init__(self, reject_reasoning: bool, error: Exception | None = None):
+        self.reject_reasoning = reject_reasoning
+        self.error = error
+        self.calls: list[bool] = []   # True when 'reasoning' was included
+
+    def parse(self, **kwargs):
+        sent_reasoning = "reasoning" in kwargs
+        self.calls.append(sent_reasoning)
+        if sent_reasoning and self.reject_reasoning:
+            raise self.error or _bad_request(UNSUPPORTED_REASONING)
+        return type("R", (), {"output_parsed": _RESULT, "status": "completed"})()
+
+
+class _FakeClient:
+    def __init__(self, responses):
+        self.responses = responses
+
+
+_RESULT = Classification(
+    rationale="r", category=Category.SPORTS, confidence=0.9
+)
+
+
+def _classifier(responses):
+    from news_classifier.classifier import NewsClassifier
+
+    return NewsClassifier(client=_FakeClient(responses))
+
+
+def test_reasoning_is_dropped_for_models_that_reject_it():
+    """gpt-4o-mini and friends 400 on 'reasoning'; the retry must recover."""
+    fake = _FakeResponses(reject_reasoning=True)
+    classifier = _classifier(fake)
+
+    assert classifier.classify("Liverpool beat Chelsea 3-0 at Anfield.") is _RESULT
+    # Tried with reasoning, then retried without.
+    assert fake.calls == [True, False]
+    assert classifier._supports_reasoning is False
+
+
+def test_unsupported_reasoning_is_only_probed_once():
+    """The retry must not repeat on every call -- that would double the cost."""
+    fake = _FakeResponses(reject_reasoning=True)
+    classifier = _classifier(fake)
+
+    for _ in range(3):
+        classifier.classify("Liverpool beat Chelsea 3-0 at Anfield.")
+
+    # One probe pair, then three plain calls -- not three probe pairs.
+    assert fake.calls == [True, False, False, False]
+
+
+def test_reasoning_is_kept_for_models_that_accept_it():
+    fake = _FakeResponses(reject_reasoning=False)
+    classifier = _classifier(fake)
+
+    classifier.classify("Liverpool beat Chelsea 3-0 at Anfield.")
+    classifier.classify("Liverpool beat Chelsea 3-0 at Anfield.")
+
+    assert fake.calls == [True, True]
+    assert classifier._supports_reasoning is True
+
+
+def test_other_bad_requests_are_not_swallowed():
+    """Only the reasoning-unsupported 400 triggers the retry."""
+    import openai
+
+    unrelated = _bad_request("Error code: 400 - context_length_exceeded")
+    fake = _FakeResponses(reject_reasoning=True, error=unrelated)
+    classifier = _classifier(fake)
+
+    with pytest.raises(openai.BadRequestError, match="context_length_exceeded"):
+        classifier.classify("Liverpool beat Chelsea 3-0 at Anfield.")
+    assert fake.calls == [True]

@@ -11,13 +11,19 @@ from .examples import FEW_SHOT_EXAMPLES
 
 # Terra balances quality against cost for this task. Luna is roughly 10x
 # cheaper if you are running volume; Sol is the flagship if the boundary cases
-# matter more than the bill. Use `news-classifier-eval --compare` to decide
-# rather than guessing -- that is what it is for.
+# matter more than the bill. Older non-reasoning models such as gpt-4o-mini
+# work too -- the reasoning parameter is dropped automatically for them. Use
+# `news-classifier-eval --compare` to decide rather than guessing.
 MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
 
 # Reasoning tokens count against max_output_tokens, so a classification-sized
 # budget of ~256 would truncate the response before the JSON was emitted.
 MAX_OUTPUT_TOKENS = 2048
+
+# Effort for models that accept it. Non-reasoning models (gpt-4o-mini and the
+# rest of the 4o family) reject the parameter outright, so it is sent
+# optimistically and dropped on the specific 400 -- see NewsClassifier.classify.
+REASONING_EFFORT = "low"
 
 _RULES = """\
 Rules:
@@ -54,6 +60,18 @@ def build_system_prompt(use_guide: bool = True) -> str:
 
 # The default prompt, kept as a module constant for callers and tests.
 SYSTEM_PROMPT = build_system_prompt()
+
+
+def _is_unsupported_reasoning(exc: openai.BadRequestError) -> bool:
+    """True when the 400 is specifically 'this model has no reasoning param'.
+
+    Matched on the message because the API gives no machine-readable code for
+    it. Kept narrow: any other bad request must still surface as an error.
+    """
+    message = (getattr(exc, "message", None) or str(exc)).lower()
+    return "reasoning" in message and (
+        "unsupported parameter" in message or "not supported" in message
+    )
 
 
 def describe_api_error(exc: openai.APIError) -> str:
@@ -122,6 +140,10 @@ class NewsClassifier:
         # the examples actually buy us. Production callers should leave it on.
         self.use_few_shot = use_few_shot
         self.use_guide = use_guide
+        # None = not yet known. Set to False the first time the model rejects
+        # the reasoning parameter, so the retry happens once per instance
+        # rather than on every call.
+        self._supports_reasoning: bool | None = None
         self._system = build_system_prompt(use_guide)
         self._prefix = _few_shot_turns() if use_few_shot else []
 
@@ -131,19 +153,36 @@ class NewsClassifier:
         if not article:
             raise ValueError("Article text is empty.")
 
-        response = self.client.responses.parse(
-            model=self.model,
-            max_output_tokens=MAX_OUTPUT_TOKENS,
-            input=[
+        request = {
+            "model": self.model,
+            "max_output_tokens": MAX_OUTPUT_TOKENS,
+            "input": [
                 {"role": "system", "content": self._system},
                 *self._prefix,
                 {"role": "user", "content": article},
             ],
-            text_format=Classification,
-            # Low effort keeps a one-label decision cheap and fast; the few-shot
-            # examples, not deliberation, are what make it consistent.
-            reasoning={"effort": "low"},
-        )
+            "text_format": Classification,
+        }
+
+        # Low effort keeps a one-label decision cheap and fast; the few-shot
+        # examples, not deliberation, are what make it consistent. Models with
+        # no reasoning mode (gpt-4o-mini and friends) reject the parameter
+        # outright, so send it, and on that one specific 400 drop it and
+        # remember. Beats a hardcoded list of reasoning models, which goes
+        # stale every release.
+        if self._supports_reasoning is False:
+            response = self.client.responses.parse(**request)
+        else:
+            try:
+                response = self.client.responses.parse(
+                    **request, reasoning={"effort": REASONING_EFFORT}
+                )
+                self._supports_reasoning = True
+            except openai.BadRequestError as exc:
+                if not _is_unsupported_reasoning(exc):
+                    raise
+                self._supports_reasoning = False
+                response = self.client.responses.parse(**request)
 
         parsed = response.output_parsed
         if parsed is None:
