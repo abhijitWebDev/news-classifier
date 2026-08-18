@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Consistency Lab — News Classifier</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#128202;</text></svg>">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <main class="app wide">
+    <header class="masthead">
+      <nav class="crumbs"><a href="/">← Classifier</a></nav>
+      <h1>Consistency Lab</h1>
+      <p class="tagline">
+        Does few-shot prompting make the classifier more consistent? Run the
+        same hard articles under each prompt configuration and compare.
+      </p>
+      <p class="status" id="status" hidden></p>
+      <p class="case-set" id="case-set" hidden></p>
+    </header>
+
+    <section class="controls">
+      <div class="control-row">
+        <div class="field">
+          <label for="runs">Runs per article</label>
+          <input type="number" id="runs" min="1" max="10" value="3">
+          <span class="hint">Consistency needs repeats — 1 run measures nothing.</span>
+        </div>
+        <div class="field grow">
+          <label>Configurations</label>
+          <div class="config-picker" id="config-picker"></div>
+        </div>
+      </div>
+      <div class="control-row footer-row">
+        <span class="counter" id="estimate">—</span>
+        <div class="actions">
+          <button type="button" class="btn ghost" id="reset">Reset</button>
+          <button type="button" class="btn primary" id="run">
+            <span class="btn-label">Run evaluation</span>
+          </button>
+        </div>
+      </div>
+      <div class="progress" id="progress" hidden>
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+        <span id="progress-label"></span>
+      </div>
+    </section>
+
+    <section class="summary" id="summary">
+      <h2>Comparison</h2>
+      <div class="scroll-x">
+        <table class="compare" id="compare">
+          <thead>
+            <tr>
+              <th>Configuration</th>
+              <th class="mid">Category guide</th>
+              <th class="mid">Few-shot</th>
+              <th>Agreement</th>
+              <th>Accuracy</th>
+            </tr>
+          </thead>
+          <tbody id="compare-body"></tbody>
+        </table>
+      </div>
+      <p class="verdict-line" id="verdict-line"></p>
+    </section>
+
+    <section class="matrix-wrap" id="matrix-wrap">
+      <h2>Per-article results</h2>
+      <div class="scroll-x">
+        <table class="matrix" id="matrix">
+          <thead><tr id="matrix-head"></tr></thead>
+          <tbody id="matrix-body"></tbody>
+        </table>
+      </div>
+      <p class="legend">
+        Each cell shows the label the configuration settled on and how often it
+        agreed with itself across runs. <span class="swatch ok"></span> correct
+        · <span class="swatch bad"></span> wrong · a striped cell means the
+        configuration disagreed with itself between runs.
+      </p>
+    </section>
+
+    <footer class="footer">
+      <span id="footer-meta"></span>
+      <a href="/docs">API docs</a>
+    </footer>
+  </main>
+
+  <script src="/static/eval.js"></script>
+</body>
+</html>

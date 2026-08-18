@@ -1,0 +1,79 @@
+{
+  "name": "Synthetic hard cases",
+  "synthetic": true,
+  "description": "Twelve articles written for this project to stress the category boundaries. Not real news: names, figures and events are invented. Replace this file with real articles to strengthen the result.",
+  "cases": [
+    {
+      "text": "The Commerce Department added four more chip-design firms to its export blacklist on Wednesday, barring them from selling advanced lithography components abroad without a licence. The rule closes a loophole that let subsidiaries route hardware through third countries. Officials said the restriction targets 3-nanometre process nodes and extreme ultraviolet tooling specifically. Industry groups warned the measure would cost domestic suppliers an estimated $4 billion in annual revenue, and two of the named firms said they would seek judicial review of the designation.",
+      "expected": "Politics",
+      "hard_because": "Dense semiconductor vocabulary and a revenue figure, but the article is a government rule-making action.",
+      "source": null
+    },
+    {
+      "text": "Riot police cleared the away end forty minutes before kickoff after supporters tore out seating and threw it onto the running track. The interior ministry has now ordered all matches in the top two divisions to be played behind closed doors for a month, and opposition MPs have called an emergency parliamentary session over the policing operation. The league said it would comply. Sunday's fixture list stands, with the derby moved to a neutral venue.",
+      "expected": "Sports",
+      "hard_because": "Ministry orders and a parliamentary session, but the subject is the fixtures and the league's response.",
+      "source": null
+    },
+    {
+      "text": "Shares in the streaming group jumped 11% after it secured exclusive rights to the national cricket board's home fixtures for five years. The company outbid two incumbent broadcasters with a bid analysts put near $2.4 billion, and said the deal would push it to subscriber profitability a year ahead of guidance. The board will use part of the proceeds to fund its domestic first-class competition.",
+      "expected": "Business",
+      "hard_because": "Cricket rights and a sports board, but framed entirely as a share price and profitability story.",
+      "source": null
+    },
+    {
+      "text": "Every ball bowled in the tournament will now be tracked by a sixteen-camera array that reconstructs the seam position in three dimensions at 340 frames per second. The governing body approved the system after a two-year trial, saying it reduced review times from ninety seconds to eleven. Broadcasters will get the reconstruction as a live feed. Umpires retain the final call, and the rollout begins with the semi-finals.",
+      "expected": "Technology",
+      "hard_because": "Set entirely inside a tournament, but the article explains how the system works and what it improves.",
+      "source": null
+    },
+    {
+      "text": "A senator who chairs the subcommittee overseeing defence procurement bought and sold shares in three contractors in the weeks around a classified briefing, according to filings released on Friday. The trades totalled $1.7 million. Her office said the transactions were executed by a blind trust and that she had no knowledge of them. Two ethics groups have asked the chamber's committee to open an inquiry.",
+      "expected": "Politics",
+      "hard_because": "Share trades and dollar amounts, but the story is a public official's conduct in office.",
+      "source": null
+    },
+    {
+      "text": "The assembly plant that employs 4,200 people in the district will close in March, the carmaker confirmed, ending nineteen years of production. The company blamed a collapse in demand for its mid-size sedans and said it would consolidate output at two southern sites. The district's representative, who faces re-election in November and campaigned on the plant's expansion, called the decision a betrayal and demanded hearings.",
+      "expected": "Business",
+      "hard_because": "Ends on an election and hearings, but the event is a corporate plant closure and consolidation.",
+      "source": null
+    },
+    {
+      "text": "Anti-doping scientists have published a mass-spectrometry method that detects a class of synthetic peptides for up to ninety days after use, against the previous window of about a week. The technique relies on isotope-ratio signatures left in hair rather than blood. The world body said it would begin retroactive testing of stored samples from the last three championships, a decision that could affect several medallists.",
+      "expected": "Technology",
+      "hard_because": "Championships and medallists in the payoff, but the substance is how a new detection method works.",
+      "source": null
+    },
+    {
+      "text": "The central bank will pilot a retail digital currency with four commercial lenders next quarter, its governor told a parliamentary committee. The design uses a permissioned ledger with offline transfer via secure elements in handsets, and caps individual holdings to limit deposit flight. The committee's chair questioned whether the privacy model would survive judicial scrutiny. Banks have warned about margin compression.",
+      "expected": "Business",
+      "hard_because": "Ledger architecture and a parliamentary committee both pull hard; the subject is monetary infrastructure and its effect on banks.",
+      "source": null
+    },
+    {
+      "text": "An appeals court struck down the injunction that had forced the app store to carry third-party payment links, ruling the lower court had exceeded its remedial authority. The decision restores the 27% commission on external transactions. Developers who had already rebuilt their checkout flows said they would revert. The plaintiff said it would petition the supreme court.",
+      "expected": "Politics",
+      "hard_because": "Commissions and developer checkout flows, but the article is about a court's ruling and its remedial authority.",
+      "source": null
+    },
+    {
+      "text": "The retired midfielder's fitness app passed twelve million downloads this month and closed a Series B at a $310 million valuation, led by a fund that also backs two rival platforms. He said the training plans are the ones he used during his final three seasons at the club, where he won two league titles. The company employs 140 people and is not yet profitable.",
+      "expected": "Business",
+      "hard_because": "Opens on an athlete and his playing career, but the article is a funding round and valuation.",
+      "source": null
+    },
+    {
+      "text": "Coverage of the opening ceremony went dark across three continents for eleven minutes after a transponder failure on the host broadcaster's primary satellite. Engineers rerouted the feed through a fibre backup, but the redundancy path had been provisioned for standard definition only. The organising committee apologised. An estimated 200 million viewers were affected, and rights holders are expected to seek compensation.",
+      "expected": "Technology",
+      "hard_because": "Opening ceremony and rights holders, but the article is about an infrastructure failure and the redundancy design.",
+      "source": null
+    },
+    {
+      "text": "Turnout in the club's presidential election reached 61%, the highest since the members' vote was introduced, with the challenger ousting a fourteen-year incumbent on a platform of reversing the stadium naming-rights sale. He takes office before the transfer window opens and has promised to back the manager with two signings. The outgoing president will retain a seat on the board.",
+      "expected": "Sports",
+      "hard_because": "Election, turnout, incumbent, platform — every keyword says Politics, but it is a football club's internal governance.",
+      "source": null
+    }
+  ]
+}

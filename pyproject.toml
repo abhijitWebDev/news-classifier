@@ -1,0 +1,33 @@
+[project]
+name = "news-classifier"
+version = "0.1.0"
+description = "Classify short news articles into Sports, Politics, Business or Technology using OpenAI with few-shot prompting, via web UI, JSON API or CLI"
+readme = "README.md"
+authors = [
+    { name = "abhijitWebDev", email = "abhijitmone2@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.141.1",
+    "openai>=3.2.0",
+    "python-dotenv>=1.2.3",
+    "uvicorn[standard]>=0.52.3",
+]
+
+[project.scripts]
+news-classifier = "news_classifier.cli:main"
+news-classifier-eval = "news_classifier.evaluate:main"
+news-classifier-serve = "news_classifier.api:main"
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+# Puts the project root on sys.path so tests can import the Vercel entrypoint
+# (app.py), which lives at the root rather than in the package.
+pythonpath = ["."]
+testpaths = ["tests"]

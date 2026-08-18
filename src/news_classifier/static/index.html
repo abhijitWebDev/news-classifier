@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>News Category Classifier</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#128240;</text></svg>">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="masthead">
+      <h1>News Category Classifier</h1>
+      <p class="tagline">Paste a short article. Get one of four categories, with the reasoning.</p>
+      <p class="status" id="status" hidden></p>
+    </header>
+
+    <section class="composer">
+      <div class="samples" id="samples" aria-label="Sample articles"></div>
+
+      <label class="sr-only" for="article">Article text</label>
+      <textarea id="article" rows="8" spellcheck="false"
+        placeholder="The Senate voted 58-42 on Thursday to advance the immigration bill, sending it to the House after three weeks of floor debate…"></textarea>
+
+      <div class="composer-foot">
+        <span class="counter" id="counter">0 characters</span>
+        <div class="actions">
+          <button type="button" class="btn ghost" id="clear">Clear</button>
+          <button type="button" class="btn ghost" id="compare">
+            <span class="btn-label">Compare prompts</span>
+          </button>
+          <button type="button" class="btn primary" id="classify">
+            <span class="btn-label">Classify</span>
+            <kbd>⌘↵</kbd>
+          </button>
+        </div>
+      </div>
+
+      <details class="compare-opts" id="compare-opts">
+        <summary>Comparison settings</summary>
+        <div class="opts-body">
+          <label for="compare-runs">Runs per configuration</label>
+          <input type="number" id="compare-runs" min="1" max="10" value="3">
+          <label class="inline-check">
+            <input type="checkbox" id="compare-bare">
+            also test on a bare prompt
+          </label>
+          <span class="hint" id="compare-cost"></span>
+        </div>
+        <p class="hint">
+          “Compare prompts” classifies this article twice over — once with the
+          few-shot examples and once without, everything else identical — and
+          reports the difference. Repeating each one is what makes
+          <em>consistency</em> measurable: one run cannot show it.
+          The <a href="/eval">Consistency lab</a> runs the same measurement over
+          a fixed set of hard articles.
+        </p>
+      </details>
+    </section>
+
+    <section class="result" id="result" hidden aria-live="polite"></section>
+
+    <section class="history" id="history" hidden>
+      <h2>Earlier in this session</h2>
+      <ul id="history-list"></ul>
+    </section>
+
+    <footer class="footer">
+      <span id="footer-meta"></span>
+      <span><a href="/eval">Consistency lab</a> · <a href="/docs">API docs</a></span>
+    </footer>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
